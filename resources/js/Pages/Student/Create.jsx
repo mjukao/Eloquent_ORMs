@@ -1,125 +1,106 @@
-import React, { useState } from 'react';
+import React from "react";
+import { useForm } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
-import Swal from 'sweetalert2';
+import { Head } from "@inertiajs/react";
+import Swal from "sweetalert2";
 
-const CreateStudent = ({ courses }) => {
+export default function Create({ courses = [] }) {
     const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        email: '',
-        dateOfBirth: '',
-        registeredCourse: ''
+        name: "",
+        email: "",
+        dob: "",
+        course: "",
     });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setData(name, value);
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post('/students', {
+        post("/students", {
             onSuccess: () => {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'สร้างสำเร็จ',
+                    icon: "success",
+                    title: "เพิ่มนักศึกษาสำเร็จ!",
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 1500,
                 });
-            }
+            },
         });
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-2xl font-semibold leading-tight text-gray-800">
-                    Create New Student
-                </h2>
-            }
-        >
-            <Head title="Create New Student" />
-            <div className="container mx-auto p-8 bg-gray-100 shadow-lg rounded-lg max-w-xl">
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                            Name
-                        </label>
+        <AuthenticatedLayout>
+            <Head title="Create Student" />
+            <div className="container mx-auto p-8 bg-gray-900 shadow-lg rounded-lg max-w-2xl mt-10">
+                <h2 className="text-3xl font-bold text-center text-purple-400 mb-6">➕ เพิ่มนักศึกษาใหม่</h2>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Name Field */}
+                    <div>
+                        <label className="block text-gray-300 font-semibold">ชื่อ</label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
                             value={data.name}
-                            onChange={handleChange}
-                            required
-                            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            onChange={(e) => setData("name", e.target.value)}
+                            className="w-full border border-gray-600 rounded-lg p-3 bg-gray-800 text-white focus:ring-2 focus:ring-purple-500"
+                            placeholder="กรอกชื่อ"
                         />
-                        {errors.name && <div className="text-red-500 text-xs mt-2">{errors.name}</div>}
+                        {errors.name && <div className="text-red-500 text-xs mt-1">{errors.name}</div>}
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-                            Email
-                        </label>
+
+                    {/* Email Field */}
+                    <div>
+                        <label className="block text-gray-300 font-semibold">อีเมล</label>
                         <input
                             type="email"
-                            id="email"
-                            name="email"
                             value={data.email}
-                            onChange={handleChange}
-                            required
-                            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            onChange={(e) => setData("email", e.target.value)}
+                            className="w-full border border-gray-600 rounded-lg p-3 bg-gray-800 text-white focus:ring-2 focus:ring-purple-500"
+                            placeholder="กรอกอีเมล"
                         />
-                        {errors.email && <div className="text-red-500 text-xs mt-2">{errors.email}</div>}
+                        {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="dateOfBirth">
-                            Date of Birth
-                        </label>
+
+                    {/* Date of Birth */}
+                    <div>
+                        <label className="block text-gray-300 font-semibold">วันเกิด</label>
                         <input
                             type="date"
-                            id="dateOfBirth"
-                            name="dateOfBirth"
-                            value={data.dateOfBirth}
-                            onChange={handleChange}
-                            required
-                            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            value={data.dob}
+                            onChange={(e) => setData("dob", e.target.value)}
+                            className="w-full border border-gray-600 rounded-lg p-3 bg-gray-800 text-white focus:ring-2 focus:ring-purple-500"
                         />
-                        {errors.dateOfBirth && <div className="text-red-500 text-xs mt-2">{errors.dateOfBirth}</div>}
+                        {errors.dob && <div className="text-red-500 text-xs mt-1">{errors.dob}</div>}
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="registeredCourse">
-                            Registered Course
-                        </label>
+
+                    {/* Course Selection */}
+                    <div>
+                        <label className="block text-gray-300 font-semibold">รายวิชาที่ลงทะเบียน</label>
                         <select
-                            id="registeredCourse"
-                            name="registeredCourse"
-                            value={data.registeredCourse}
-                            onChange={handleChange}
-                            required
-                            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            value={data.course}
+                            onChange={(e) => setData("course", e.target.value)}
+                            className="w-full border border-gray-600 rounded-lg p-3 bg-gray-800 text-white focus:ring-2 focus:ring-purple-500"
                         >
-                            <option value="">Select a course</option>
+                            <option value="">ไม่มีการลงทะเบียน</option>
                             {courses.map((course) => (
                                 <option key={course.id} value={course.id}>
-                                    {course.name}
+                                    {course.name} ({course.code})
                                 </option>
                             ))}
                         </select>
-                        {errors.registeredCourse && <div className="text-red-500 text-xs mt-2">{errors.registeredCourse}</div>}
+                        {errors.course && <div className="text-red-500 text-xs mt-1">{errors.course}</div>}
                     </div>
-                    <div className="flex items-center justify-between">
+
+                    {/* Submit Button */}
+                    <div className="mt-6 flex justify-center">
                         <button
                             type="submit"
                             disabled={processing}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded focus:outline-none focus:shadow-outline w-full"
+                            className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg focus:ring-2 focus:ring-purple-500 disabled:opacity-50 transition duration-200"
                         >
-                            Create Student
+                            ➕ เพิ่มนักศึกษา
                         </button>
                     </div>
                 </form>
             </div>
         </AuthenticatedLayout>
     );
-};
-
-export default CreateStudent;
+}

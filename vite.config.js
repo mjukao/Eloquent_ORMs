@@ -10,4 +10,5 @@ export default defineConfig({
         }),
         react(),
     ],
+    publicDir: 'public', // ตรวจสอบให้แน่ใจว่า publicDir ถูกตั้งค่าให้เข้าถึงไฟล์ใน public/
 });

@@ -20,6 +20,20 @@ class StudentController extends Controller
         }
 
         $students = $query->get();
+
+        // จัดการข้อมูลของ courses ให้ไม่มี null
+        $students->transform(function ($student) {
+            $student->courses = $student->registers->map(function ($register) {
+                return $register->course;
+            })->filter();
+
+            if ($student->courses->isEmpty()) {
+                $student->courses = collect([['name' => 'ยังไม่มีการลงทะเบียน', 'code' => '']]);
+            }
+
+            return $student;
+        });
+
         return Inertia::render('Student/Index', ['students' => $students]);
     }
 
@@ -29,76 +43,64 @@ class StudentController extends Controller
         return Inertia::render('Student/Create', ['courses' => $courses]);
     }
 
-    // เพิ่มนักศึกษาใหม่
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:students',
-            'dateOfBirth' => 'required|date',
-            'registeredCourse' => 'required|exists:courses,id',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:students|max:255',
+            'dob' => 'required|date',
+            'course' => 'nullable|exists:courses,id',
         ]);
 
-        $student = Student::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'dob' => $request->dateOfBirth,
-        ]);
+        $student = Student::create($validated);
 
-        Register::create([
-            'student_id' => $student->id,
-            'course_id' => $request->registeredCourse,
-        ]);
+        if ($request->course) {
+            Register::create([
+                'student_id' => $student->id,
+                'course_id' => $request->course,
+            ]);
+        }
 
-        return redirect()->route('students.index')->with('message', 'Student created successfully');
+        return redirect()->route('students.index')->with('message', 'Student created successfully!');
     }
 
-    // แสดงรายละเอียดของนักศึกษา
-    public function show($id)
-    {
-        $student = Student::findOrFail($id);
-        return response()->json($student);
-    }
-
-    // แก้ไขข้อมูลนักศึกษา
     public function edit($id)
     {
         $student = Student::findOrFail($id);
-        return Inertia::render('Student/Edit', ['student' => $student]);
+        $courses = Course::all();
+        return Inertia::render('Student/Edit', [
+            'student' => $student,
+            'courses' => $courses
+        ]);
     }
 
-    // อัปเดตข้อมูลนักศึกษา
     public function update(Request $request, $id)
     {
-        $student = Student::findOrFail($id);
-        $student->update($request->all());
-        return redirect()->route('students.index')->with('message', 'Student updated successfully');
-    }
-
-    // ลบนักศึกษา
-    public function destroy($id)
-    {
-        $student = Student::findOrFail($id);
-        $student->delete();
-        return redirect()->route('students.index')->with('message', 'Deleted successfully');
-    }
-
-    // ลงทะเบียนนักศึกษาในรายวิชา
-    public function registerCourse(Request $request)
-    {
-        $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'course_id' => 'required|exists:courses,id',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'dob' => 'required|date',
+            'course' => 'nullable|exists:courses,id',
         ]);
 
-        $register = Register::create($request->all());
-        return response()->json($register, 201);
+        $student = Student::findOrFail($id);
+        $student->update($validated);
+
+        Register::where('student_id', $id)->delete();
+
+        if ($request->course) {
+            Register::create([
+                'student_id' => $student->id,
+                'course_id' => $request->course,
+            ]);
+        }
+
+        return redirect()->route('students.index')->with('message', 'Student updated successfully!');
     }
 
-    // แสดงรายวิชาที่นักศึกษาลงทะเบียน
-    public function studentCourses($student_id)
+    public function destroy($id)
     {
-        $student = Student::with('registers.course')->findOrFail($student_id);
-        return response()->json($student->registers);
+        Student::findOrFail($id)->delete();
+        return redirect()->route('students.index')->with('message', 'Student deleted successfully!');
     }
 }

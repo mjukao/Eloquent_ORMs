@@ -19,15 +19,13 @@ export default function Index() {
 
     const deleteStudent = (id) => {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this",
+            title: 'คุณต้องการลบนักศึกษานี้?',
+            text: "โปรดตรวจสอบให้แน่ใจว่าคุณต้องการลบนักศึกษานี้ออกจากระบบ",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#6B46C1',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'delete'
-
-
+            confirmButtonText: 'ลบ'
         }).then((result) => {
             if (result.isConfirmed) {
                 Inertia.delete(`/students/${id}`, {
@@ -44,67 +42,84 @@ export default function Index() {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    รายชื่อนักศึกษา
-                </h2>
-            }
-        >
+        <AuthenticatedLayout>
             <Head title="รายชื่อนักศึกษา" />
-            <div className="container mx-auto p-8 bg-gray-100 shadow-lg rounded-lg">
-                <input
-                    type="text"
-                    placeholder="ค้นหานักศึกษา"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="mb-4 p-2 border rounded w-full"
-                />
-                <table className="min-w-full bg-gray-800 text-white shadow-md rounded-lg">
-                    <thead>
-                        <tr className="bg-purple-600">
-                            <th className="py-3 px-4 text-left">ชื่อ</th>
-                            <th className="py-3 px-4 text-left">อีเมล</th>
-                            <th className="py-3 px-4 text-left">วันเกิด</th>
-                            <th className="py-3 px-4 text-left">รายวิชาที่ลงทะเบียน</th>
-                            <th className="py-3 px-4 text-left">แก้ไข/ลบ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredStudents.map((student) => (
-                            <tr key={student.id} className="border-b border-gray-600">
-                                <td className="py-3 px-4">{student.name}</td>
-                                <td className="py-3 px-4">{student.email}</td>
-                                <td className="py-3 px-4">{student.dob}</td>
-                                <td className="py-3 px-4">
-                                    {student.registers && student.registers.length > 0 ? (
-                                        student.registers.map((register) => (
-                                            <div key={register.id}>
-                                                {register.course ? `${register.course.name} (${register.course.code})` : "ไม่พบรายวิชา"}
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <span className="text-gray-400">ยังไม่มีการลงทะเบียน</span>
-                                    )}
-                                </td>
-                                <td className="py-3 px-4">
-                                    <button
-                                        className="text-blue-500 hover:text-blue-700 hover:underline"
-                                        onClick={() => editStudent(student.id)}>
-                                        แก้ไข
-                                    </button>
-                                    <button
-                                        className={`text-red-500 hover:text-red-700 hover:underline ml-2 ${student.unavailable ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        onClick={() => !student.unavailable && deleteStudent(student.id)}
-                                        disabled={student.unavailable}
-                                    >
-                                        ลบ
-                                    </button>
-                                </td>
+            <div className="container mx-auto p-8 bg-gray-900 shadow-lg rounded-lg mt-8">
+
+                {/* หัวข้อ */}
+                <h2 className="text-3xl font-bold text-center text-purple-400 mb-6">
+                    📋 รายชื่อนักศึกษา
+                </h2>
+
+                {/* ช่องค้นหา */}
+                <div className="mb-6 flex justify-center">
+                    <div className="relative w-2/3">
+                        <input
+                            type="text"
+                            placeholder="🔍 ค้นหานักศึกษา..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full p-3 pl-10 text-white bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                        <span className="absolute left-3 top-3 text-gray-400"></span>
+                    </div>
+                </div>
+
+                {/* ตารางนักศึกษา */}
+                <div className="overflow-x-auto rounded-lg shadow-lg">
+                    <table className="w-full border border-gray-800 rounded-lg overflow-hidden">
+                        <thead>
+                            <tr className="bg-gradient-to-r from-purple-900 to-purple-600 text-white text-lg text-center">
+                                <th className="p-4 text-center w-1/5">ชื่อ</th>
+                                <th className="p-4 text-center w-1/5">อีเมล</th>
+                                <th className="p-4 text-center w-1/5">วันเกิด</th>
+                                <th className="p-4 text-center w-1/5">รายวิชาที่ลงทะเบียน</th>
+                                <th className="p-4 text-center w-1/5">แก้ไข / ลบ</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {filteredStudents.length > 0 ? (
+                                filteredStudents.map((student, index) => (
+                                    <tr key={student.id} className={`${index % 2 === 0 ? "bg-gray-800" : "bg-gray-700"} hover:bg-gray-600 transition text-center`}>
+                                        <td className="p-4 text-white font-medium">{student.name}</td>
+                                        <td className="p-4 text-gray-300">{student.email}</td>
+                                        <td className="p-4 text-purple-300 font-semibold">{student.dob}</td>
+                                        <td className="p-4">
+                                            {student.registers && student.registers.length > 0 ? (
+                                                student.registers.map((register) => (
+                                                    <div key={register.id} className="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-medium inline-block">
+                                                        {register.course ? `${register.course.name} (${register.course.code})` : "ไม่พบรายวิชา"}
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <span className="text-gray-400 italic font-medium">ยังไม่มีการลงทะเบียน</span>
+                                            )}
+                                        </td>
+                                        <td className="p-4 flex justify-center gap-4">
+                                            <button
+                                                className="text-purple-400 font-bold hover:underline hover:text-purple-500"
+                                                onClick={() => editStudent(student.id)}
+                                            >
+                                                แก้ไข
+                                            </button>
+                                            <button
+                                                className={`text-red-400 font-bold hover:underline hover:text-red-500 ${student.unavailable ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                onClick={() => !student.unavailable && deleteStudent(student.id)}
+                                                disabled={student.unavailable}
+                                            >
+                                                ลบ
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="p-6 text-center text-gray-400">ไม่พบนักศึกษาตามคำค้นหา</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </AuthenticatedLayout>
     );

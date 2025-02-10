@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // นำเข้า HasFactory
 use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
 {
-    use HasFactory;
+    use HasFactory; // ใช้ HasFactory ในโมเดลนี้
 
     protected $fillable = ['name', 'code'];
 
-    public function registers()
+    // ความสัมพันธ์ Many-to-Many กับ Course
+    public function courses()
     {
-        return $this->hasMany(Register::class);
+        return $this->belongsToMany(Course::class, 'registers');
     }
 }
+
