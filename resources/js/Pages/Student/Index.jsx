@@ -56,7 +56,7 @@ export default function Index() {
                     <div className="relative w-2/3">
                         <input
                             type="text"
-                            placeholder="🔍 ค้นหานักศึกษา..."
+                            placeholder="🔍 ค้นหาชื่อนักศึกษา..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full p-3 pl-10 text-white bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
