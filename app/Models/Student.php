@@ -18,7 +18,7 @@ class Student extends Model
         return $this->hasMany(Register::class);
     }
 
-    // สร้างความสัมพันธ์แบบ Many to Many กับ Course
+    // สร้างความสัมพันธ์แบบ belongsToMany กับ Course
     public function courses()
     {
         return $this->belongsToMany(Course::class, 'registers', 'student_id', 'course_id');

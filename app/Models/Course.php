@@ -11,7 +11,7 @@ class Course extends Model
 
     protected $fillable = ['name', 'code'];
 
-    // ความสัมพันธ์ Many-to-Many กับ Course
+    // ความสัมพันธ์ belongsToMany กับ Course
     public function courses()
     {
         return $this->belongsToMany(Course::class, 'registers');
